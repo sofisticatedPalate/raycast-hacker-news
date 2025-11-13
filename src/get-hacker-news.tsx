@@ -1,28 +1,70 @@
-import { ActionPanel, Action, Icon, List } from "@raycast/api";
+// use a third-party dependency to parse the RSS feed: rss-parser
+// define our command state as a TypeScript interface
+// use React's useEffect hook to parse the RSS feed after the command did mount
+// print the top stories to the console
+// render a list and show the loading indicator as long as we load the stories
 
-const ITEMS = Array.from(Array(3).keys()).map((key) => {
-  return {
-    id: key,
-    icon: Icon.Bird,
-    title: "Title " + key,
-    subtitle: "Subtitle",
-    accessory: "Accessory",
-  };
-});
+// *** REFACTOR ***
+// Added the necessary imports for ActionPanel and Action from 
+// raycast/api
+// Replaced the simple List component with a fully-featured list that:
+// Maps through each story in state.items
+// Displays the story title and author
+// Shows the publication date in the accessories
+// Includes actions to open the story in a browser or copy the URL
+// Handles loading and error states
+// The list will now show each story with its title, author, and publication date. You can:
+// Click on any story to open it in your default browser
+// Press Cmd + . to copy the story URL to your clipboard
+// The list will show a loading indicator while fetching the stories and handle any errors that might occur during the fetch.
+
+import { List, ActionPanel, Action } from "@raycast/api";
+import { useEffect, useState } from "react";
+import Parser from "rss-parser";
+
+const parser = new Parser();
+
+interface State {
+  items?: Parser.Item[];
+  error?: Error;
+}
 
 export default function Command() {
+  const [state, setState] = useState<State>({});
+
+  useEffect(() => {
+    async function fetchStories() {
+      try {
+        const feed = await parser.parseURL("https://hnrss.org/frontpage?description=0&count=25");
+        setState({ items: feed.items });
+      } catch (error) {
+        setState({
+          error: error instanceof Error ? error : new Error("Something went wrong"),
+        });
+      }
+    }
+
+    fetchStories();
+  }, []);
+
   return (
-    <List>
-      {ITEMS.map((item) => (
+    <List isLoading={!state.items && !state.error}>
+      {state.items?.map((item, index) => (
         <List.Item
-          key={item.id}
-          icon={item.icon}
-          title={item.title}
-          subtitle={item.subtitle}
-          accessories={[{ icon: Icon.Text, text: item.accessory }]}
+          key={item.guid || index}
+          title={item.title || 'No title'}
+          subtitle={item.creator || 'Unknown author'}
+          accessories={[
+            { text: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : '' },
+          ]}
           actions={
             <ActionPanel>
-              <Action.CopyToClipboard content={item.title} />
+              <Action.OpenInBrowser url={item.link || ''} />
+              <Action.CopyToClipboard
+                title="Copy URL"
+                content={item.link || ''}
+                shortcut={{ modifiers: ["cmd"], key: "." }}
+              />
             </ActionPanel>
           }
         />
