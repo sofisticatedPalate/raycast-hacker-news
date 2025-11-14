@@ -14,12 +14,17 @@
   - Don't worry, you don't need to be an expert. If you need some help with the basics, check out TypeScript's [Handbook](https://www.typescriptlang.org/docs/handbook/intro.html) and React's [Getting Started](https://react.dev/learn) guide.
 
 ## Build the extension
-- Open your terminal, navigate to the `raycast---hacker-news` extension directory and run `npm install && npm run dev`. 
+- Open your terminal, navigate to the `raycast---hacker-news` extension directory and run `npm install` to install the dependencies. 
+- Run `npm run dev` to start the development server. 
 - Open Raycast, and you'll notice the extension at the top of the root search. 
 - Press Enter to open it.
 - You should see a list of the top stories from Hacker News.
 
 ## Functionality
-- double-click on a story to open it in your default browser.
-- press Enter to open it in your default browser.
-- press Command + K to open options.
+- press Enter (or double-click) on a story to open it in your default browser.
+- press Command + K to open options:
+  - open in browser
+  - copy URL to clipboard
+
+## Demo
+![Demo](assets/Kapture%202025-11-14%20at%2010.00.09.gif)
