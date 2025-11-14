@@ -4,7 +4,7 @@
 
 - This is an UNPUBLISHED extension for Raycast that shows the top stories from Hacker News.
 - Raycast is available for macOS now, and there is a waitlist for Windows.
-- This repository was initialized using the 'Create Extension' command in Raycast. Instructions for this can be found here: https://developers.raycast.com/basics/create-your-first-extension
+- This repository was initialized using the 'Create Extension' command in Raycast. Instructions for this can be found here: <https://developers.raycast.com/basics/create-your-first-extension>
 
 ## Requirements
 - Raycast 1.26.0 or higher installed (macOS)
