@@ -49,26 +49,34 @@ export default function Command() {
 
   return (
     <List isLoading={!state.items && !state.error}>
-      {state.items?.map((item, index) => (
-        <List.Item
-          key={item.guid || index}
-          title={item.title || 'No title'}
-          subtitle={item.creator || 'Unknown author'}
-          accessories={[
-            { text: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : '' },
-          ]}
-          actions={
-            <ActionPanel>
-              <Action.OpenInBrowser url={item.link || ''} />
-              <Action.CopyToClipboard
-                title="Copy URL"
-                content={item.link || ''}
-                shortcut={{ modifiers: ["cmd"], key: "." }}
-              />
-            </ActionPanel>
-          }
+      {state.error ? (
+        <List.EmptyView
+          title="Error loading Hacker News"
+          description={state.error.message || String(state.error)}
+          icon={Icon.ExclamationMark}
         />
-      ))}
+      ) : (
+        state.items?.map((item, index) => (
+          <List.Item
+            key={item.guid || index}
+            title={item.title || 'No title'}
+            subtitle={item.creator || 'Unknown author'}
+            accessories={[
+              { text: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : '' },
+            ]}
+            actions={
+              <ActionPanel>
+                <Action.OpenInBrowser url={item.link || ''} />
+                <Action.CopyToClipboard
+                  title="Copy URL"
+                  content={item.link || ''}
+                  shortcut={{ modifiers: ["cmd"], key: "." }}
+                />
+              </ActionPanel>
+            }
+          />
+        ))
+      )}
     </List>
   );
 }
