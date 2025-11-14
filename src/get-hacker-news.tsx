@@ -1,43 +1,28 @@
-// use a third-party dependency to parse the RSS feed: rss-parser
-// define our command state as a TypeScript interface
-// use React's useEffect hook to parse the RSS feed after the command did mount
-// print the top stories to the console
-// render a list and show the loading indicator as long as we load the stories
-
-// *** REFACTOR ***
-// Added the necessary imports for ActionPanel and Action from 
-// raycast/api
-// Replaced the simple List component with a fully-featured list that:
-// Maps through each story in state.items
-// Displays the story title and author
-// Shows the publication date in the accessories
-// Includes actions to open the story in a browser or copy the URL
-// Handles loading and error states
-// The list will now show each story with its title, author, and publication date. You can:
-// Click on any story to open it in your default browser
-// Press Cmd + . to copy the story URL to your clipboard
-// The list will show a loading indicator while fetching the stories and handle any errors that might occur during the fetch.
-
-import { List, ActionPanel, Action } from "@raycast/api";
+import { List, ActionPanel, Action, Icon } from "@raycast/api";
 import { useEffect, useState } from "react";
 import Parser from "rss-parser";
 
+// RSS parser instance for fetching Hacker News stories
 const parser = new Parser();
 
+// TypeScript interface defining the command's state structure
 interface State {
-  items?: Parser.Item[];
-  error?: Error;
+  items?: Parser.Item[];  // Array of parsed RSS items (stories)
+  error?: Error;          // Error state if fetching fails
 }
 
 export default function Command() {
   const [state, setState] = useState<State>({});
 
+  // useEffect hook to fetch RSS feed after component mounts
   useEffect(() => {
     async function fetchStories() {
       try {
+        // Fetch and parse Hacker News RSS feed (25 stories, no descriptions)
         const feed = await parser.parseURL("https://hnrss.org/frontpage?description=0&count=25");
         setState({ items: feed.items });
       } catch (error) {
+        // Handle any errors during fetch and update error state
         setState({
           error: error instanceof Error ? error : new Error("Something went wrong"),
         });
@@ -50,12 +35,14 @@ export default function Command() {
   return (
     <List isLoading={!state.items && !state.error}>
       {state.error ? (
+        // Error view displayed when RSS fetch fails
         <List.EmptyView
           title="Error loading Hacker News"
           description={state.error.message || String(state.error)}
           icon={Icon.ExclamationMark}
         />
       ) : (
+        // Map through stories and render each as a list item
         state.items?.map((item, index) => (
           <List.Item
             key={item.guid || index}
@@ -65,6 +52,7 @@ export default function Command() {
               { text: item.pubDate ? new Date(item.pubDate).toLocaleDateString() : '' },
             ]}
             actions={
+              // Action panel with options to open story or copy URL
               <ActionPanel>
                 <Action.OpenInBrowser url={item.link || ''} />
                 <Action.CopyToClipboard
